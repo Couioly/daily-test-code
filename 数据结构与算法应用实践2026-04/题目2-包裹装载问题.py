@@ -9,7 +9,6 @@ def create():
         orders.append((id, weight, value, unit_value))    
     capacity = int(input())
 
-    # 快速排序按单位价值降序排序
     def quick_sort(arr):
         if len(arr) <= 1:
             return arr
@@ -23,17 +22,29 @@ def create():
     return orders, capacity
   
 def select(orders, capacity):
-    selected_orders = [] 
-    total_weight = 0       
-    total_value = 0
+    best_orders = []
+    best_value = 0
+    best_count = 0
     
-    for order in orders:
-        id, weight, value, unit_value = order
+    for start in range(len(orders)):
+        selected = []
+        total_weight = 0
+        total_value = 0
         
-        if total_weight + weight <= capacity:
-            selected_orders.append(id)
-            total_weight += weight
-            total_value += value
+        for i in range(start, len(orders)):
+            order = orders[i]
+            id, weight, value, unit_value = order
+            
+            if total_weight + weight <= capacity:
+                selected.append(id)
+                total_weight += weight
+                total_value += value
+        
+        # 更新最优方案：价值更高，或价值相同但订单数更多
+        if (total_value > best_value) or (total_value == best_value and len(selected) > best_count):
+            best_value = total_value
+            best_count = len(selected)
+            best_orders = selected
     
     # 对订单编号进行升序排序
     def quick_sort(arr):
@@ -45,8 +56,8 @@ def select(orders, capacity):
         right = [x for x in arr if x > pivot]
         return quick_sort(left) + middle + quick_sort(right)
     
-    selected_orders = quick_sort(selected_orders)
-    return selected_orders, total_value
+    best_orders = quick_sort(best_orders)
+    return best_orders, best_value
 
 if __name__ == "__main__":
     orders, capacity = create()
